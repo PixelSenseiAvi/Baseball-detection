@@ -152,42 +152,10 @@ class YOLOLayer(nn.Module):
 
             return output, total_loss
 
-#in_channels = channels, out_channels = filters
-# def convolutional(net_layers, in_channels, out_channels, kernel_size, stride, pad, bn, activation):
-#     #print(in_channels)
-#     net = nn.Conv2d(in_channels = in_channels[-1], out_channels = out_channels, kernel_size = kernel_size, stride = stride, padding = pad, bias = not bn)
-#     net_layers.append(net)
-#     if bn:
-#         net_layers.append(nn.BatchNorm2d(out_channels, momentum=0.9, eps=1e-5))
-#     if activation=='leaky':
-#         net_layers.append(nn.LeakyReLU(0.1))
-#     in_channels.append(out_channels)
-#     return net_layers, in_channels
-#
-#
-# def maxpool(net_layers, kernel_size, stride):
-#     if kernel_size == 2 and stride == 1:
-#         net_layers.append(nn.ZeroPad2d((0, 1, 0, 1)))
-#     maxp = nn.MaxPool2d(kernel_size=kernel_size, stride=stride, padding=int((kernel_size - 1) // 2))
-#     net_layers.append(maxp)
-#     return net_layers
 
 def upsample(stride):
     return Upsample(scale_factor=int(stride), mode="nearest")
 
-# def route(net_layers, in_channels, layers):
-#     #layers = [int(x) for x in module_def["layers"].split(",")]
-#     #sample layers = [4, -1] see cfg
-#     out_channels = sum([in_channels[1:][i] for i in layers])
-#     net_layers.append(EmptyLayer())
-#     in_channels.append(out_channels)
-#     return net_layers, in_channels
-#
-# def shortcut(net_layers, in_channels, fr, activation):
-#     out_channels = in_channels[1:][fr]
-#     net_layers.append(EmptyLayer())
-#     in_channels.append(out_channels)
-#     return net_layers, in_channels
 
 def yolo(mask, anchors, classes, num,jitter, ignore_thresh, truth_thresh, random, height):
     anchor_idxs = mask
@@ -256,16 +224,6 @@ class Darknet(nn.Module):
         self.bn = 1
 
         self.layers = []
-
-        # self.block1 = Block(64, 2)
-        # self.block2 = Block(128, 2)
-        # self.block3 = Block(256, 2)
-        # self.block4 = Block(512, 2)
-        # self.block5 = Block(1024, 2)
-        # self.block6 = Block(512)
-        # self.block7 = Block(1024)
-        # self.block8 = Block(256)
-
 
         self.activation = nn.LeakyReLU(0.1)
 
@@ -356,17 +314,6 @@ class Darknet(nn.Module):
         random2=1
         self.yolo2 = yolo(mask2, anchors2, classes2, num2, jitter2, ignore_thresh2, truth_thresh2, random2, self.height)
 
-        # #YOLO3
-        # mask3 = [0,1,2]
-        # anchors3 = [10,13,  16,30,  33,23,  30,61,  62,45,  59,119,  116,90,  156,198,  373,326]
-        # classes3=1
-        # num3=9
-        # jitter3=.3
-        # ignore_thresh3 = .7
-        # truth_thresh3 = 1
-        # random3=1
-        # self.yolo3 = yolo(mask3, anchors3, classes3, num3, jitter3, ignore_thresh3, truth_thresh3, random3)
-
 
     def forward(self, input):
         x = self.conv1(x)
@@ -393,35 +340,19 @@ class Darknet(nn.Module):
         x = self.activation(x)
         x = self.mp4(x)
 
-        # route4 =x
-        # for i in range(0,8):
-        #     x = self.block3.forward(x)
-        #     if i ==4:
-        #         route2 = self.block3.return_route()
-
         x = self.conv5(x)
         x = self.bn5(x)
         x = self.activation(x)
         x = self.mp5(x)
-
-        # for i in range(0,8):
-        #     x = self.block4.forward(x)
 
         x = self.conv6(x)
         x = self.bn6(x)
         x = self.activation(x)
         x = self.mp6(x)
 
-        # for i in range(0,4):
-        #     x = self.block5.forward(x)
-
         x = self.conv7(x)
         x = self.bn7(x)
         x = self.activation(x)
-
-        # x = self.block6.forward(x)
-        # x = self.block7.forward(x)
-        # route1 = x
 
         x = self.conv8(x)
         x = self.bn8(x)
@@ -456,31 +387,7 @@ class Darknet(nn.Module):
         x = self.bn13(x)
 
         x = self.yolo2(x)
-
-        # x = self.upsample(x)
-        # x = x + route2
-        # x = self.conv11(x)
-        # x = self.bn11(x)
-        # x = self.activation(x)
-        # x = self.conv12(x)
-        # x =self.bn12(x)
-        # x = self.activation(x)
-        # for i in range(0, 2):
-        #     x = self.block8.forward(x)
-        # x = self.conv13(x)
-        # route3 = x
-        # x= self.yolo2(x)
-        # x = x+ route3
-        # x = self.conv14(x)
-        # x = self.bn14(x)
-        # x = self.activation(x)
-        # x = self.upsample(x)
-        # x = x+route4
-        # x =self.conv15(x)
-        # x= self.bn15(x)
-        # x =self.activation(x)
-        # x = self.conv16(x)
-        # x =self.yolo3(x)
+        
 
     def load_darknet_weights(self, weights_path):
         """Parses and loads the weights stored in 'weights_path'"""
@@ -562,11 +469,3 @@ class Darknet(nn.Module):
                 conv_layer.weight.data.cpu().numpy().tofile(fp)
 
         fp.close()
-
-
-
-
-
-# if __name__ == "__main__":
-#     a = Darknet(img_size=416, channels = 3)
-#     a.forward()
