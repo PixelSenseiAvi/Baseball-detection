@@ -231,7 +231,7 @@ def yolo(mask, anchors, classes, num,jitter, ignore_thresh, truth_thresh, random
 class Darknet(nn.Module):
     """YOLOv3 object detection model"""
 
-    def __init__(self, img_size=416, channels =3):
+    def __init__(self, channels =3):
         super(Darknet, self).__init__()
 
         #hyperparams
@@ -267,59 +267,59 @@ class Darknet(nn.Module):
         # self.block8 = Block(256)
 
 
-        self.activation = nn.LeakyRelu(0.1)
+        self.activation = nn.LeakyReLU(0.1)
 
-        self.conv1 = nn.conv2d(3, 16, 3, 1, 1)
+        self.conv1 = nn.Conv2d(3, 16, 3, 1, 1)
         self.bn1 = nn.BatchNorm2d(16, 0.9, 1e-5)
         self.mp1 = nn.MaxPool2d(16, stride=2, padding=int((2 - 1) // 2))
 
-        self.conv2 = nn.conv2d(16, 32, 3, stride = 1, padding = 1)
+        self.conv2 = nn.Conv2d(16, 32, 3, stride = 1, padding = 1)
         self.bn2 = nn.BatchNorm2d(32, 0.9, 1e-5)
         self.mp2 = nn.MaxPool2d(32, stride = 2, padding=int((2 - 1) // 2))
 
-        self.conv3 = nn.conv2d(32, 64, 3, 1, 1)
+        self.conv3 = nn.Conv2d(32, 64, 3, 1, 1)
         self.bn3 = nn.BatchNorm2d(64, 0.9, 1e-5)
         self.mp3 = nn.MaxPool2d(64, stride = 2, padding=int((2 - 1) // 2))
 
-        self.conv4 = nn.conv2d(64, 128, 3, 1, 1)
+        self.conv4 = nn.Conv2d(64, 128, 3, 1, 1)
         self.bn4 = nn.BatchNorm2d(128, 0.9, 1e-5)
         self.mp4 = nn.MaxPool2d(128, stride = 2, padding=int((2 - 1) // 2))
 
-        self.conv5 = nn.conv2d(128, 256, 3, 1, 1)
+        self.conv5 = nn.Conv2d(128, 256, 3, 1, 1)
         self.bn5 = nn.BatchNorm2d(256, 0.9, 1e-5)
         self.mp5 = nn.MaxPool2d(256, stride = 2, padding=int((2 - 1) // 2))
 
-        self.conv6 = nn.conv2d(256, 52, 3, 1, 1)
+        self.conv6 = nn.Conv2d(256, 52, 3, 1, 1)
         self.bn6 = nn.BatchNorm2d(52, 0.9, 1e-5)
         self.mp6 = nn.MaxPool2d(52, stride = 1, padding=int((2 - 1) // 2))
 
-        self.conv7 = nn.conv2d(52, 1024, 3, 1, 1)
+        self.conv7 = nn.Conv2d(52, 1024, 3, 1, 1)
         self.bn7 = nn.BatchNorm2d(1024, 0.9, 1e-5)
 
         #######
-        self.conv8 = nn.conv2d(1024, 256, 1, 1, 1)
+        self.conv8 = nn.Conv2d(1024, 256, 1, 1, 1)
         self.bn8 = nn.BatchNorm2d(256, 0.9, 1e-5)
 
-        self.conv9 = nn.conv2d(256, 512, 3, 1, 1)
+        self.conv9 = nn.Conv2d(256, 512, 3, 1, 1)
         self.bn9 = nn.BatchNorm2d(512, 0.9, 1e-5)
 
-        self.conv10 = nn.conv2d(256, 18, 1, 1, 1)
+        self.conv10 = nn.Conv2d(256, 18, 1, 1, 1)
         self.bn10 = nn.BatchNorm2d(18, 0.9, 1e-5)
         # #self.upsample = upsample(2)
         #
         #
-        # self.conv11 = nn.conv2d(256, 256,1,1,1 )
+        # self.conv11 = nn.Conv2d(256, 256,1,1,1 )
         # self.bn11 = nn.BatchNorm2d(256, 0.9, 1e-5)
-        # self.conv12 = nn.conv2d(256, 512,1,1,1 )
+        # self.conv12 = nn.Conv2d(256, 512,1,1,1 )
         # self.bn12 = nn.BatchNorm2d(512, 0.9, 1e-5)
-        # self.conv13 = nn.conv2d(512, 18, 1, 1, 1)
+        # self.conv13 = nn.Conv2d(512, 18, 1, 1, 1)
         #
-        # self.conv14 = nn.conv2d(512, 128, 1, 1, 1)
+        # self.conv14 = nn.Conv2d(512, 128, 1, 1, 1)
         # self.bn14 = nn.BatchNorm2d(128, 0.9, 1e-5)
-        # self.conv15 = nn.conv2d(128, 128, 1, 1, 1)
+        # self.conv15 = nn.Conv2d(128, 128, 1, 1, 1)
         # self.bn15 = nn.BatchNorm2d(128, 0.9, 1e-5)
 
-        # self.conv16 = nn.conv2d(128,18, 1, 1, 1)
+        # self.conv16 = nn.Conv2d(128,18, 1, 1, 1)
 
         #yolo1
         mask1 = [3,4,5]
@@ -330,19 +330,19 @@ class Darknet(nn.Module):
         ignore_thresh1 = .7
         truth_thresh1 = 1
         random1=1
-        self.yolo1 = yolo(mask1, anchors1, classes1, num1, jitter1, ignore_thresh1, truth_thresh1, random1)
+        self.yolo1 = yolo(mask1, anchors1, classes1, num1, jitter1, ignore_thresh1, truth_thresh1, random1, self.height)
 
         # check for 18 or 1, should be 18 most probably
-        self.conv11 = nn.conv2d(18, 128, 1, 1, 1)
+        self.conv11 = nn.Conv2d(18, 128, 1, 1, 1)
         self.bn11 = nn.BatchNorm2d(128, 0.9, 1e-5)
 
         self.upsample1 = upsample(2)
 
         #22
-        self.conv12 = nn.conv2d(128, 256, 1, 1, 1)
+        self.conv12 = nn.Conv2d(128, 256, 1, 1, 1)
         self.bn12 = nn.BatchNorm2d(256, 0.9, 1e-5)
 
-        self.conv13 = nn.conv2d(256, 18, 1, 1, 1)
+        self.conv13 = nn.Conv2d(256, 18, 1, 1, 1)
         self.bn13 = nn.BatchNorm2d(18, 0.9, 1e-5)
 
         #yolo2
@@ -354,7 +354,7 @@ class Darknet(nn.Module):
         ignore_thresh2 = .7
         truth_thresh2 = 1
         random2=1
-        self.yolo2 = yolo(mask2, anchors2, classes2, num2, jitter2, ignore_thresh2, truth_thresh2, random2)
+        self.yolo2 = yolo(mask2, anchors2, classes2, num2, jitter2, ignore_thresh2, truth_thresh2, random2, self.height)
 
         # #YOLO3
         # mask3 = [0,1,2]
@@ -441,7 +441,7 @@ class Darknet(nn.Module):
         x = x + route1
 
         x = self.conv11(x)
-        x = self.bn11(x
+        x = self.bn11(x)
         x = self.activation(x)
 
         x = self.upsample1(x)
@@ -482,10 +482,91 @@ class Darknet(nn.Module):
         # x = self.conv16(x)
         # x =self.yolo3(x)
 
+    def load_darknet_weights(self, weights_path):
+        """Parses and loads the weights stored in 'weights_path'"""
+
+        # Open the weights file
+        with open(weights_path, "rb") as f:
+            header = np.fromfile(f, dtype=np.int32, count=5)  # First five are header values
+            self.header_info = header  # Needed to write header when saving weights
+            self.seen = header[3]  # number of images seen during training
+            weights = np.fromfile(f, dtype=np.float32)  # The rest are weights
+
+        # Establish cutoff for loading backbone weights
+        cutoff = None
+        if "darknet53.conv.74" in weights_path:
+            cutoff = 75
+
+        ptr = 0
+        for i, (module_def, module) in enumerate(zip(self.module_defs, self.module_list)):
+            if i == cutoff:
+                break
+            if module_def["type"] == "convolutional":
+                conv_layer = module[0]
+                if module_def["batch_normalize"]:
+                    # Load BN bias, weights, running mean and running variance
+                    bn_layer = module[1]
+                    num_b = bn_layer.bias.numel()  # Number of biases
+                    # Bias
+                    bn_b = torch.from_numpy(weights[ptr : ptr + num_b]).view_as(bn_layer.bias)
+                    bn_layer.bias.data.copy_(bn_b)
+                    ptr += num_b
+                    # Weight
+                    bn_w = torch.from_numpy(weights[ptr : ptr + num_b]).view_as(bn_layer.weight)
+                    bn_layer.weight.data.copy_(bn_w)
+                    ptr += num_b
+                    # Running Mean
+                    bn_rm = torch.from_numpy(weights[ptr : ptr + num_b]).view_as(bn_layer.running_mean)
+                    bn_layer.running_mean.data.copy_(bn_rm)
+                    ptr += num_b
+                    # Running Var
+                    bn_rv = torch.from_numpy(weights[ptr : ptr + num_b]).view_as(bn_layer.running_var)
+                    bn_layer.running_var.data.copy_(bn_rv)
+                    ptr += num_b
+                else:
+                    # Load conv. bias
+                    num_b = conv_layer.bias.numel()
+                    conv_b = torch.from_numpy(weights[ptr : ptr + num_b]).view_as(conv_layer.bias)
+                    conv_layer.bias.data.copy_(conv_b)
+                    ptr += num_b
+                # Load conv. weights
+                num_w = conv_layer.weight.numel()
+                conv_w = torch.from_numpy(weights[ptr : ptr + num_w]).view_as(conv_layer.weight)
+                conv_layer.weight.data.copy_(conv_w)
+                ptr += num_w
+
+    def save_darknet_weights(self, path, cutoff=-1):
+        """
+            @:param path    - path of the new weights file
+            @:param cutoff  - save layers between 0 and cutoff (cutoff = -1 -> all are saved)
+        """
+        fp = open(path, "wb")
+        self.header_info[3] = self.seen
+        self.header_info.tofile(fp)
+
+        # Iterate through layers
+        for i, (module_def, module) in enumerate(zip(self.module_defs[:cutoff], self.module_list[:cutoff])):
+            if module_def["type"] == "convolutional":
+                conv_layer = module[0]
+                # If batch norm, load bn first
+                if module_def["batch_normalize"]:
+                    bn_layer = module[1]
+                    bn_layer.bias.data.cpu().numpy().tofile(fp)
+                    bn_layer.weight.data.cpu().numpy().tofile(fp)
+                    bn_layer.running_mean.data.cpu().numpy().tofile(fp)
+                    bn_layer.running_var.data.cpu().numpy().tofile(fp)
+                # Load conv bias
+                else:
+                    conv_layer.bias.data.cpu().numpy().tofile(fp)
+                # Load conv weights
+                conv_layer.weight.data.cpu().numpy().tofile(fp)
+
+        fp.close()
 
 
 
 
-if __name__ == "__main__":
-    a = Darknet(img_size=416, channels = 3)
-    a.forward()
+
+# if __name__ == "__main__":
+#     a = Darknet(img_size=416, channels = 3)
+#     a.forward()
